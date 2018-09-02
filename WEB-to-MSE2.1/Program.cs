@@ -6,11 +6,6 @@ using System.Threading.Tasks;
 using HtmlAgilityPack;
 using System.Net;
 
-//public static void gfsf()
-//{
-//
-//}
-
 namespace WEB_to_MSE2._1
 {
     public class Card
@@ -24,7 +19,7 @@ namespace WEB_to_MSE2._1
 
     class Program
     {
-        static void Main(string[] args)
+        public static void Dadada()
         {
             int SetCount = 0;
             string SetCode = "HOU";
@@ -35,7 +30,7 @@ namespace WEB_to_MSE2._1
             HtmlDocument scryfall = new HtmlDocument();
 
             scryfall.LoadHtml(MTG.DownloadString("https://scryfall.com/sets/hou?order=set"));
-            
+
 
             SetCount = scryfall.DocumentNode.SelectNodes("//a[@class='card-grid-item']").Count;
 
@@ -56,7 +51,7 @@ namespace WEB_to_MSE2._1
 
                 //HtmlDocument SingleCardRu = new HtmlDocument();
                 //SingleCardRu.LoadHtml(CardRu.LoadHtml(cards.DocumentNode.SelectSingleNode("//div[@class='print-langs']/a[@title='Show version in Russian']").GetAttributeValue("href", "")));
-                
+
                 Console.WriteLine(CardRu.Text);
 
                 //Cards[i].id = scryfall.DocumentNode.SelectNodes("//a[@class='card-grid-item']")[i].GetAttributeValue("data-id","");
@@ -79,6 +74,26 @@ namespace WEB_to_MSE2._1
 
             //            Console.WriteLine(scryfall.Text);
 
+        }
+
+        public static Card GetRuCard(string href)
+        {
+            HtmlDocument htmlDocument = new HtmlDocument();
+            var aa = new WebClient();
+            aa.Encoding = Encoding.UTF8;
+            htmlDocument.LoadHtml(aa.DownloadString(href));
+            var Cards = new Card();
+
+            Cards.Name = htmlDocument.DocumentNode.SelectSingleNode("//h1[@class='card-text-title']").InnerText;
+            Cards.id = "dfsdfsfsdfsdfsd";
+
+            return Cards;
+        }
+
+        static void Main(string[] args)
+        {
+            //Console.WriteLine(GetRuCard("https://scryfall.com/card/hou/1/ru/%D0%B3%D0%B5%D1%80%D0%BE%D0%B8%D1%87%D0%B5%D1%81%D0%BA%D0%B8%D0%B9-%D0%BF%D0%BE%D0%B4%D0%B2%D0%B8%D0%B3"));
+            Console.WriteLine(GetRuCard("https://scryfall.com/card/hou/1/ru/%D0%B3%D0%B5%D1%80%D0%BE%D0%B8%D1%87%D0%B5%D1%81%D0%BA%D0%B8%D0%B9-%D0%BF%D0%BE%D0%B4%D0%B2%D0%B8%D0%B3").Name);
         }
     }
 }
