@@ -39,7 +39,7 @@ namespace WEB_to_MSE2._1
         {
             Console.WriteLine("Имя: " + Name);
             Console.WriteLine("Стоимость: " + Cost);
-            Console.WriteLine("Ссылка на изображение: " + Img);
+            Console.WriteLine("Ссылка на изображение: " + Img.Http);
             Console.WriteLine("Тип: " + Type);
             Console.WriteLine("Редкость: " + Rarity);
             Console.WriteLine("Oracle текст: " + TextOracle);
@@ -55,61 +55,6 @@ namespace WEB_to_MSE2._1
 
     class Program
     {
-        public static void Dadada()
-        {
-            int SetCount = 0;
-            string SetCode = "HOU";
-            string SetLocation = "D:/sets/" + SetCode + "/set";
-            List<Card> Cards = new List<Card>();
-
-            WebClient MTG = new WebClient();
-            HtmlDocument scryfall = new HtmlDocument();
-
-            scryfall.LoadHtml(MTG.DownloadString("https://scryfall.com/sets/hou?order=set"));
-            SetCount = scryfall.DocumentNode.SelectNodes("//a[@class='card-grid-item']").Count;
-
-            for (var i = 0; i < SetCount; i++)
-            {
-                Cards.Add(new Card());
-                Cards[i].href = scryfall.DocumentNode.SelectNodes("//a[@class='card-grid-item']")[i].GetAttributeValue("href", "");
-
-                HtmlDocument cards = new HtmlDocument();
-                cards.LoadHtml(MTG.DownloadString(Cards[i].href));
-                string aaa = cards.DocumentNode.SelectSingleNode("//div[@class='print-langs']/a[@title='Show version in Russian']").GetAttributeValue("href", "");
-                //Console.WriteLine(cards.DocumentNode.SelectSingleNode("//div[@class='print-langs']/a[@title='Show version in Russian']").InnerHtml);
-
-                HtmlDocument CardRu = new HtmlDocument();
-                CardRu.LoadHtml(MTG.DownloadString(aaa));
-                //string bbb = 
-
-
-                //HtmlDocument SingleCardRu = new HtmlDocument();
-                //SingleCardRu.LoadHtml(CardRu.LoadHtml(cards.DocumentNode.SelectSingleNode("//div[@class='print-langs']/a[@title='Show version in Russian']").GetAttributeValue("href", "")));
-
-                Console.WriteLine(CardRu.Text);
-
-                //Cards[i].id = scryfall.DocumentNode.SelectNodes("//a[@class='card-grid-item']")[i].GetAttributeValue("data-id","");
-                //
-
-                //
-
-                //
-                //Cards[i].Img = (cards.DocumentNode.SelectNodes("//a[@class='button-n']")[13].GetAttributeValue("href", ""));
-
-                //Console.WriteLine(cards.DocumentNode.SelectNodes("//a[@class='button-n']")[13].GetAttributeValue("href", ""));
-
-                //Console.WriteLine(Cards[i].id);
-                //Console.WriteLine(Cards[i].href);
-
-                Console.ReadLine();
-            }
-
-            //Console.WriteLine(scryfall.DocumentNode.SelectNodes("//a[@class='card-grid-item']").Count);
-
-            //            Console.WriteLine(scryfall.Text);
-
-        }
-
         public static string Name(HtmlDocument htmlDocument)
         {
             string Name;
@@ -220,6 +165,10 @@ namespace WEB_to_MSE2._1
         public static Img Img(HtmlDocument htmlDocument)
         {
             var Img = new Img();
+            var WebClient = new WebClient();
+            HtmlDocument document = new HtmlDocument();
+            document.LoadHtml(WebClient.DownloadString(htmlDocument.DocumentNode.SelectSingleNode("//a[@title='Show version in English']").GetAttributeValue("href", "google.com")));
+            Img.Http = document.DocumentNode.SelectNodes("//a[@class='button-n']")[0].GetAttributeValue("href", "google.com");
             return Img;
         }
 
