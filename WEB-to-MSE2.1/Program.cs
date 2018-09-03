@@ -9,27 +9,46 @@ using System.Text.RegularExpressions;
 
 namespace WEB_to_MSE2._1
 {
+    public class Stats
+    {
+        public string   Power,
+                        Loyalty,
+                        Toughness;
+    }
+
+    public class Img
+    {
+        public string   Http,
+                        Local;
+    }
+    
     public class Card
     {
         public string   Name,
                         Cost,
                         Type,
+                        Rarity,
                         TextOracle,
                         TextFlavor,
-
-            id, href,   Img,  NumberOfSet, Stats, Rarity, NameENG, stylesheet, FileImg, Color,
-                          loyalty, Illustrator, Power, Toughness, TextBoxes, NumberCoordinates, DividerCoordinates, SpecialText;
-        public Int32 Number;
-        public List<string> LoyaltyCost = new List<string>();
-        public List<string> LevelText = new List<string>();
+                        Illustrator,
+                        NumberOfSet;
+        public Stats    stats;
+        public Img      Img;
 
         public void Print()
         {
             Console.WriteLine("Имя: " + Name);
             Console.WriteLine("Стоимость: " + Cost);
+            Console.WriteLine("Ссылка на изображение: " + Img);
             Console.WriteLine("Тип: " + Type);
+            Console.WriteLine("Редкость: " + Rarity);
             Console.WriteLine("Oracle текст: " + TextOracle);
             Console.WriteLine("Художественный текст: " + TextFlavor);
+            Console.WriteLine("Сила: " + stats.Power);
+            Console.WriteLine("Прочность: " + stats.Toughness);
+            Console.WriteLine("Лояльность: " + stats.Loyalty);
+            Console.WriteLine("Художник: " + Illustrator);
+            Console.WriteLine("Номер: " + NumberOfSet);
             Console.WriteLine("");
         }
     }
@@ -47,8 +66,6 @@ namespace WEB_to_MSE2._1
             HtmlDocument scryfall = new HtmlDocument();
 
             scryfall.LoadHtml(MTG.DownloadString("https://scryfall.com/sets/hou?order=set"));
-
-
             SetCount = scryfall.DocumentNode.SelectNodes("//a[@class='card-grid-item']").Count;
 
             for (var i = 0; i < SetCount; i++)
@@ -143,6 +160,69 @@ namespace WEB_to_MSE2._1
             
         }
 
+        public static Stats Stats(HtmlDocument htmlDocument)
+        {
+            var Stats = new Stats();
+            Stats.Power = null;
+            Stats.Toughness = null;
+            Stats.Loyalty = null;
+
+            if (htmlDocument.DocumentNode.SelectSingleNode("//div[@class='card-text-stats']") != null)
+            {
+                if (htmlDocument.DocumentNode.SelectSingleNode("//div[@class='card-text-stats']").InnerText.IndexOf("Loyalty") > -1)
+                {
+                    Stats.Loyalty = Regex.Split(htmlDocument.DocumentNode.SelectSingleNode("//div[@class='card-text-stats']").InnerText, ":")[1].Trim();
+                } else
+                {
+                    Stats.Power = Regex.Split(htmlDocument.DocumentNode.SelectSingleNode("//div[@class='card-text-stats']").InnerText, "/")[0].Trim();
+                    Stats.Toughness = Regex.Split(htmlDocument.DocumentNode.SelectSingleNode("//div[@class='card-text-stats']").InnerText, "/")[1].Trim();
+                }
+            };
+            return Stats;
+        }
+
+        public static string Illustrator(HtmlDocument htmlDocument)
+        {
+            if (htmlDocument.DocumentNode.SelectSingleNode("//p[@class='card-text-artist']") != null)
+            {
+                return htmlDocument.DocumentNode.SelectSingleNode("//p[@class='card-text-artist']/a").InnerText.Trim();
+            }
+            else
+            {
+                return null;
+            }
+        }
+
+        public static string NumberOfSet(HtmlDocument htmlDocument)
+        {
+            if (htmlDocument.DocumentNode.SelectSingleNode("//span[@class='prints-current-set-details']") != null)
+            {
+                return Regex.Split(htmlDocument.DocumentNode.SelectSingleNode("//span[@class='prints-current-set-details']").InnerText, "·")[0].Replace("#", "").Trim();
+            }
+            else
+            {
+                return null;
+            }
+        }
+
+        public static string Rarity(HtmlDocument htmlDocument)
+        {
+            if (htmlDocument.DocumentNode.SelectSingleNode("//span[@class='prints-current-set-details']") != null)
+            {
+                return Regex.Split(htmlDocument.DocumentNode.SelectSingleNode("//span[@class='prints-current-set-details']").InnerText, "·")[1].Trim();
+            }
+            else
+            {
+                return null;
+            }
+        }
+
+        public static Img Img(HtmlDocument htmlDocument)
+        {
+            var Img = new Img();
+            return Img;
+        }
+
         public static Card GetRuCard(string href)
         {
             HtmlDocument htmlDocument = new HtmlDocument();
@@ -153,9 +233,14 @@ namespace WEB_to_MSE2._1
 
             Cards.Name          = Name(htmlDocument);
             Cards.Cost          = Cost(htmlDocument); 
+            Cards.Img           = Img(htmlDocument); 
             Cards.Type          = Type(htmlDocument);
+            Cards.Rarity        = Rarity(htmlDocument);
             Cards.TextOracle    = TextOracle(htmlDocument);
             Cards.TextFlavor    = TextFlavor(htmlDocument);
+            Cards.stats         = Stats(htmlDocument);
+            Cards.Illustrator   = Illustrator(htmlDocument);
+            Cards.NumberOfSet   = NumberOfSet(htmlDocument);
 
             return Cards;
         }
@@ -166,6 +251,7 @@ namespace WEB_to_MSE2._1
             GetRuCard("https://scryfall.com/card/hou/1/ru/%D0%B3%D0%B5%D1%80%D0%BE%D0%B8%D1%87%D0%B5%D1%81%D0%BA%D0%B8%D0%B9-%D0%BF%D0%BE%D0%B4%D0%B2%D0%B8%D0%B3").Print();
             GetRuCard("https://scryfall.com/card/hou/165/ru/%D0%B7%D0%B5%D1%80%D0%BA%D0%B0%D0%BB%D0%BE-%D0%BC%D0%B8%D1%80%D0%B0%D0%B6%D0%B5%D0%B9").Print();
             GetRuCard("https://scryfall.com/card/hou/195/ru/%D0%B1%D0%BE%D0%BB%D0%BE%D1%82%D0%BE").Print();
+            GetRuCard("https://scryfall.com/card/hou/144/ru/%D1%81%D0%B0%D0%BC%D1%83%D1%82-%D0%B8%D1%81%D0%BF%D1%8B%D1%82%D0%B0%D0%BD%D0%BD%D0%B0%D1%8F").Print();
         }
     }
 }
